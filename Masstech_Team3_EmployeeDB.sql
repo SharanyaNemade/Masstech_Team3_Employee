@@ -168,23 +168,44 @@ CREATE TABLE Role (
 
 
 
+EXEC sp_rename 'Role.ModifyBy', 'ModifiedBy', 'COLUMN';
+
+TRUNCATE TABLE Role;
 
 
-
-INSERT INTO Role (RoleName, Status, CreatedBy, ModifyBy)
+INSERT INTO Role (RoleName, Status, CreatedBy, ModifiedBy)
 VALUES 
-('Administrator', 'Active', 'System', 'System'),
-('Manager', 'Active', 'System', 'System'),
-('Team Lead', 'Active', 'System', 'System'),
-('Developer', 'Active', 'System', 'System'),
-('Tester', 'Active', 'System', 'System'),
-('HR', 'Active', 'System', 'System'),
-('Guest', 'Inactive', 'System', 'System');
+('Admin', 'Active', 'Admin', 'Admin'),
+('Manager', 'Active', 'Admin', 'Admin'),
+('Employee', 'Active', 'Admin', 'Admin');
 
 
+
+
+
+INSERT INTO Role (RoleName, Status, CreatedBy, ModifiedBy)
+VALUES 
+('Team Lead', 'Active', 'Admin', 'Admin'),
+('Developer', 'Active', 'Admin', 'Admin'),
+('Tester', 'Active', 'Admin', 'Admin'),
+('HR', 'Active', 'Admin', 'Admin'),
+('Accountant', 'Active', 'Admin', 'Admin'),
+('Support', 'Active', 'Admin', 'Admin'),
+('Guest', 'Inactive', 'Admin', 'Admin');
+
+
+
+UPDATE Role
+SET Status = 'Inactive'
+WHERE RoleName IN ('Tester', 'Support', 'Accountant');
+
+
+
+UPDATE Role
+SET Status = 'Inactive'
+WHERE RoleID = 3;
 
 select * from role;
-
 
 
 
@@ -195,10 +216,21 @@ select * from role;
 CREATE PROCEDURE sp_GetAllRoles
 AS
 BEGIN
-    SELECT RoleID, RoleName, Status, CreatedBy, ModifyBy
+    SELECT RoleID, RoleName, Status, CreatedBy, ModifiedBy
     FROM Role
     ORDER BY RoleName;
 END
+
+
+
+ALTER PROCEDURE sp_GetAllRoles
+AS
+BEGIN
+    -- We use 'AS ModifiedBy' to match your ASPX DataField
+    SELECT RoleId, RoleName, Status, CreatedBy, ModifiedBy 
+    FROM Role;
+END
+
 
 
 
@@ -208,7 +240,7 @@ CREATE PROCEDURE sp_GetRoleByID
     @RoleID INT
 AS
 BEGIN
-    SELECT RoleID, RoleName, Status, CreatedBy, ModifyBy
+    SELECT RoleID, RoleName, Status, CreatedBy, ModifiedBy
     FROM Role
     WHERE RoleID = @RoleID;
 END
@@ -222,11 +254,12 @@ END
 CREATE PROCEDURE sp_InsertRole
     @RoleName VARCHAR(100),
     @Status BIT,
-    @CreatedBy VARCHAR(50)
+    @CreatedBy VARCHAR(50),
+    @ModifiedBy VARCHAR(50)
 AS
 BEGIN
-    INSERT INTO Role (RoleName, Status, CreatedBy)
-    VALUES (@RoleName, @Status, @CreatedBy);
+    INSERT INTO Role (RoleName, Status, CreatedBy, ModifiedBy)
+    VALUES (@RoleName, @Status, @CreatedBy, @ModifiedBy);
 END
 
 
@@ -237,13 +270,13 @@ CREATE PROCEDURE sp_UpdateRole
     @RoleID INT,
     @RoleName VARCHAR(100),
     @Status BIT,
-    @ModifyBy VARCHAR(50)
+    @ModifiedBy VARCHAR(50)
 AS
 BEGIN
     UPDATE Role
     SET RoleName = @RoleName,
         Status = @Status,
-        ModifyBy = @ModifyBy
+        ModifiedBy = @ModifiedBy
     WHERE RoleID = @RoleID;
 END
 
