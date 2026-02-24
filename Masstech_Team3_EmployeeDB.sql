@@ -5,22 +5,191 @@ use Masstech_Team3;
                                             -------  Users  -------
 
 
+--CREATE TABLE Users
+--(
+--   UserId INT IDENTITY(1,1) PRIMARY KEY,
+
+--    FirstName NVARCHAR(100) NOT NULL,
+--    LastName NVARCHAR(100) NOT NULL,
+--    Email NVARCHAR(255) NOT NULL UNIQUE,
+--    PasswordHash NVARCHAR(255) NOT NULL,
+--    PhoneNumber NVARCHAR(20) NULL,
+--    Status BIT NOT NULL DEFAULT 1,  -- 1 = Active, 0 = Inactive
+--   CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+--    UpdatedAt DATETIME2 NULL
+--);
+
+-- drop table users;
+
+
+
+
 CREATE TABLE Users
 (
     UserId INT IDENTITY(1,1) PRIMARY KEY,
-
-    FirstName NVARCHAR(100) NOT NULL,
-    LastName NVARCHAR(100) NOT NULL,
+    Name NVARCHAR(150) NOT NULL,
     Email NVARCHAR(255) NOT NULL UNIQUE,
     PasswordHash NVARCHAR(255) NOT NULL,
     PhoneNumber NVARCHAR(20) NULL,
-    Status BIT NOT NULL DEFAULT 1,  -- 1 = Active, 0 = Inactive
-    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
-    UpdatedAt DATETIME2 NULL
+    RoleName NVARCHAR(50) NOT NULL   -- e.g., Admin, Manager, Employee
 );
 
 
+
+
+
+
+ALTER TABLE Users
+ADD 
+    Designation NVARCHAR(100) NULL,
+    ReportingManagerId INT NULL,
+    DOJ DATE NULL,
+    Status NVARCHAR(20) NOT NULL DEFAULT 'Active',
+    CreatedBy INT NULL,
+    CreatedDate DATETIME DEFAULT GETDATE(),
+    ModifyBy INT NULL,
+    ModifyDate DATETIME NULL,
+    Action NVARCHAR(50) NULL;
+
+
+ALTER TABLE Users
+ADD PhotoUrl NVARCHAR(500) NULL;
+
+ALTER TABLE Users
+ADD ModifiedBy VARCHAR(100) NULL;
+
+ALTER TABLE Users
+DROP COLUMN ReportingManagerId;
+
+ALTER TABLE Users
+DROP COLUMN ModifyBy;
+
+
+ALTER TABLE Users
+ADD ReportingManager NVARCHAR(150) NULL;
+
+
+
+
+ALTER PROCEDURE sp_GetAllUsers
+AS
+BEGIN
+    SELECT 
+        UserId,
+        Name,
+        Email,
+        PhoneNumber,
+        Designation,
+        ReportingManager,
+        DOJ,
+        Status,
+        CreatedBy,
+        Action
+    FROM Users
+END
+
+
+
+drop procedure sp_GetAllUsers;
+
+CREATE PROCEDURE sp_GetAllUsers
+AS
+BEGIN
+    SELECT 
+        UserId,
+        Name,
+        Email,
+        PhoneNumber,
+        Designation,
+        ReportingManager,
+        DOJ,
+        Status,
+        CreatedBy,
+        Action,
+        PhotoUrl,
+        ModifiedBy
+    FROM Users
+END
+
+
+
+
+
+
+
+CREATE PROCEDURE sp_GetEmployeeSummary
+AS
+BEGIN
+    SELECT 
+        COUNT(*) AS TotalEmployee,
+        SUM(CASE WHEN Status = 'Active' THEN 1 ELSE 0 END) AS ActiveEmployee,
+        SUM(CASE WHEN Status = 'Inactive' THEN 1 ELSE 0 END) AS InactiveEmployee,
+        SUM(CASE 
+                WHEN DATEDIFF(DAY, DOJ, GETDATE()) <= 30 
+                THEN 1 ELSE 0 
+            END) AS NewJoiner
+    FROM Users
+END
+
+
+
+
+
+INSERT INTO Users (Name, Email, PasswordHash, PhoneNumber, RoleName)
+VALUES
+('Alice Admin', 'admin@gmail.com', 'Admin@123', '9999999999', 'Admin'),
+('Bob Manager', 'manager@gmail.com', 'Manager@123', '8888888888', 'Manager'),
+('Charlie Employee', 'employee@gmail.com', 'Employee@123', '7777777777', 'Employee');
+
+
+
 select * from Users;
+
+
+
+--  Procedure for Login Page
+
+CREATE PROCEDURE sp_logindetails
+    @Email NVARCHAR(255),
+    @Password NVARCHAR(255)
+AS
+BEGIN
+
+   
+    SELECT Name, Email, PasswordHash, PhoneNumber, RoleName
+    FROM Users
+    WHERE Email = @Email
+      AND PasswordHash = @Password;
+END;
+
+
+
+
+
+EXEC sp_logindetails 'admin@gmail.com', 'Admin@123';
+
+
+
+
+--  Procedure for Employee List
+
+CREATE PROCEDURE sp_GetAllUsers
+AS
+BEGIN
+    SELECT 
+        Name,
+        Email,
+        PhoneNumber,
+        Designation,
+        ReportingManager,
+        DOJ,
+        Status,
+        CreatedBy,
+        Action
+    FROM Users
+END
+
+
 
 
 
