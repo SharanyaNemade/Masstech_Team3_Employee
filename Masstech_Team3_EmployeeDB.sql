@@ -243,6 +243,12 @@ VALUES
 ('Operations', 8, 'Yes', 'Admin', GETDATE());
 
 
+UPDATE department 
+SET Status = 'Active' 
+WHERE Status = 'Yes';
+
+
+
 delete from Department
 where DepartmentId = 5;
 
@@ -462,3 +468,162 @@ BEGIN
     DELETE FROM Role
     WHERE RoleID = @RoleID;
 END
+
+
+
+
+
+
+
+									----------------------- Designation ---------------------
+
+
+CREATE TABLE Department (
+    DepartmentId INT IDENTITY(1,1) UNIQUE,			-- Added UNIQUE constraint
+    DepartmentName VARCHAR(50) NOT NULL PRIMARY KEY, 
+    NoOfEmp INT NOT NULL,
+    Active VARCHAR(50) NULL,
+    CreatedBy VARCHAR(50) NOT NULL,
+    ModifiedBy VARCHAR(50) NULL,
+    CreatedDate DATETIME DEFAULT GETDATE(),			-- Useful for auto-stamping
+    ModifiedDate DATETIME NULL
+);
+
+drop table department;
+
+
+
+INSERT INTO Department (DepartmentName, NoOfEmp, Active, CreatedBy)
+VALUES 
+('Human Resources', 5, 'Yes', 'Admin'),
+('Information Technology', 25, 'Yes', 'Admin'),
+('Finance', 10, 'Yes', 'Admin'),
+('Marketing', 12, 'Yes', 'Admin'),
+('Sales', 20, 'Yes', 'Admin');
+
+
+
+
+
+select * from Department;
+
+
+
+
+CREATE TABLE Designation (
+	DesignationId INT IDENTITY(1,1) UNIQUE,
+    DesignationName VARCHAR(100) NOT NULL PRIMARY KEY,
+    DepartmentName VARCHAR(50) NOT NULL, -- The column to hold the link
+    NoOfEmp INT NOT NULL,
+    Status VARCHAR(10),
+    CreatedBy VARCHAR(50),
+    ModifyBy VARCHAR(50),
+    
+    -- Defining the Foreign Key relationship
+    CONSTRAINT FK_Designation_Department 
+    FOREIGN KEY (DepartmentName) REFERENCES Department(DepartmentName)
+    ON UPDATE CASCADE -- If you rename a Dept, it updates here automatically
+);
+
+
+
+truncate table designation;
+
+
+INSERT INTO Designation (DesignationName, DepartmentName, NoOfEmp, Status, CreatedBy, ModifyBy)
+VALUES 
+('HR Manager', 'Finance', 1, 'Active', 'Admin', 'Admin'),
+('Software Engineer', 'Human Resources', 15, 'Active', 'Admin', 'Admin'),
+('System Administrator', 'Information Technology', 3, 'Active', 'Admin', 'Admin'),
+('Accountant', 'Marketing', 4, 'Active', 'Admin', 'Admin'),
+('SEO Specialist', 'Sales', 2, 'Active', 'Admin', 'Admin');
+
+
+
+
+
+
+select * from Designation;
+
+
+
+
+
+
+
+
+CREATE PROCEDURE sp_GetAllDesignations
+AS
+BEGIN
+    SELECT * FROM Designation;
+END;
+
+
+
+
+
+ALTER PROCEDURE sp_GetAllDesignations
+AS
+BEGIN
+    -- Ensure the column name here is the NEW one: DesignationId
+    SELECT DesignationId, DesignationName, NoOfEmp, Status, CreatedBy, ModifyBy 
+    FROM Designation;
+END
+
+
+
+
+
+
+CREATE PROCEDURE sp_GetAllDesignationsById
+    @DesignationId INT
+AS
+BEGIN
+    SELECT * FROM Designation WHERE DesignationId = @DesignationId;
+END;
+
+
+
+
+
+CREATE PROCEDURE sp_InsertDesignations
+    @DesignationName VARCHAR(100),
+    @DepartmentName VARCHAR(50),
+    @NoOfEmp INT,
+    @Status VARCHAR(10),
+    @CreatedBy VARCHAR(50)
+AS
+BEGIN
+    INSERT INTO Designation (DesignationName, DepartmentName, NoOfEmp, Status, CreatedBy)
+    VALUES (@DesignationName, @DepartmentName, @NoOfEmp, @Status, @CreatedBy);
+END;
+
+
+
+
+
+CREATE PROCEDURE sp_UpdateDesignations
+    @DesignationName VARCHAR(100),
+    @DepartmentName VARCHAR(50),
+    @NoOfEmp INT,
+    @Status VARCHAR(10),
+    @ModifyBy VARCHAR(50)
+AS
+BEGIN
+    UPDATE Designation
+    SET DepartmentName = @DepartmentName,
+        NoOfEmp = @NoOfEmp,
+        Status = @Status,
+        ModifyBy = @ModifyBy
+    WHERE DesignationName = @DesignationName;
+END;
+
+
+
+
+CREATE PROCEDURE sp_DeleteDesignations
+    @DesignationName VARCHAR(100)
+AS
+BEGIN
+    DELETE FROM Designation WHERE DesignationName = @DesignationName;
+END;

@@ -57,30 +57,26 @@ namespace Masstech_Team3_Employee
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
-            using (SqlConnection conn = new SqlConnection(cs))
-            {
-                using (SqlCommand cmd = new SqlCommand("sp_InsertDepartment", conn))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
+            string deptName = txtDepartmentName.Text;
+            string status = ddlStatus.SelectedValue;
 
-                    cmd.Parameters.AddWithValue("@DepartmentName", txtDepartmentName.Text);
-                    cmd.Parameters.AddWithValue("@NoOfEmp", 0);
-                    cmd.Parameters.AddWithValue("@Status", ddlStatus.SelectedValue);
-                    cmd.Parameters.AddWithValue("@CreatedBy", "Admin");
+            SqlConnection conn = new SqlConnection(cs);
+            conn.Open();
 
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
-                }
-            }
+            string q = $"exec sp_InsertDepartment '{deptName}', 0, '{status}', 'Admin'";
+            SqlCommand cmd = new SqlCommand(q, conn);
+            cmd.ExecuteNonQuery();
+
+            conn.Close();
+
+            Response.Write("<script>alert('Department Saved Successfully')</script>");
 
             txtDepartmentName.Text = "";
             ddlStatus.SelectedIndex = 0;
-
             pnlModal.Visible = false;
 
-            FetchDepartments(); // or FetchList() if that’s your method name
+            FetchDepartments();
         }
-
 
         protected void ddlFilterStatus_SelectedIndexChanged(object sender, EventArgs e)
         {

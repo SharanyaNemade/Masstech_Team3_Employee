@@ -74,6 +74,15 @@
             float: right;
         }
 
+
+        .modal {
+            z-index: 2000 !important;
+        }
+
+        .modal-backdrop {
+            z-index: 1999 !important;
+        }
+
     </style>
 </head>
 
@@ -101,7 +110,13 @@
             <!-- Header -->
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4>Employee</h4>
-                <asp:Button ID="btnAddEmployee" runat="server" Text="+ Add Employee" CssClass="btn btn-warning top-btn" />
+                <asp:Button ID="btnAddEmployee"
+                    runat="server"
+                    Text="+ Add Employee"
+                    CssClass="btn btn-warning top-btn"
+                    OnClientClick="return false;"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addEmployeeModal" OnClick="btnAddEmployee_Click" />
             </div>
 
             <!-- Summary Cards -->
@@ -218,6 +233,149 @@
             </div>
 
         </div>
+
+
+
+        <!-- Add Employee Modal -->
+<div class="modal fade" id="addEmployeeModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Add Employee</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <!-- Upload Section -->
+                <div class="border rounded p-3 mb-4 bg-light">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="rounded-circle border d-flex justify-content-center align-items-center"
+                                 style="width:80px;height:80px;">
+                                <i class="fa fa-user text-muted"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Upload Profile Image</h6>
+                            <small class="text-muted">Image should be below 4 mb</small><br />
+                            <asp:FileUpload ID="fuPhoto" runat="server" CssClass="form-control mt-2" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Fields -->
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label>First Name *</label>
+                        <asp:TextBox ID="txtFirstName" runat="server" CssClass="form-control"></asp:TextBox>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Last Name</label>
+                        <asp:TextBox ID="txtLastName" runat="server" CssClass="form-control"></asp:TextBox>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Email *</label>
+                        <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control"></asp:TextBox>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Password *</label>
+                        <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" CssClass="form-control"></asp:TextBox>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Joining Date *</label>
+                        <asp:TextBox ID="txtJoiningDate" runat="server" TextMode="Date" CssClass="form-control"></asp:TextBox>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Birth Date *</label>
+                        <asp:TextBox ID="txtBirthDate" runat="server" TextMode="Date" CssClass="form-control"></asp:TextBox>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Role</label>
+                        <asp:DropDownList ID="ddlRole" runat="server" CssClass="form-select">
+                            <asp:ListItem Text="-- Select Role --" Value=""></asp:ListItem>
+                            <asp:ListItem>Admin</asp:ListItem>
+                            <asp:ListItem>Employee</asp:ListItem>
+                        </asp:DropDownList>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Department</label>
+                        <asp:DropDownList ID="ddlDepartment" runat="server" CssClass="form-select">
+                            <asp:ListItem Text="-- Select Department --" Value=""></asp:ListItem>
+                            <asp:ListItem>IT</asp:ListItem>
+                            <asp:ListItem>HR</asp:ListItem>
+                        </asp:DropDownList>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Manager</label>
+                        <asp:DropDownList ID="ddlManager" runat="server" CssClass="form-select">
+                            <asp:ListItem Text="-- Select Manager --" Value=""></asp:ListItem>
+                        </asp:DropDownList>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Designation</label>
+                        <asp:DropDownList ID="ddlNewDesignation" runat="server" CssClass="form-select">
+                            <asp:ListItem Text="-- Select Designation --" Value=""></asp:ListItem>
+                        </asp:DropDownList>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Phone Number *</label>
+                        <asp:TextBox ID="txtPhone" runat="server" CssClass="form-control"></asp:TextBox>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Address *</label>
+                        <asp:TextBox ID="txtAddress" runat="server" CssClass="form-control"></asp:TextBox>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Gender</label>
+                        <asp:DropDownList ID="ddlGender" runat="server" CssClass="form-select">
+                            <asp:ListItem>Select</asp:ListItem>
+                            <asp:ListItem>Male</asp:ListItem>
+                            <asp:ListItem>Female</asp:ListItem>
+                        </asp:DropDownList>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Status</label>
+                        <asp:DropDownList ID="ddlNewStatus" runat="server" CssClass="form-select">
+                            <asp:ListItem>Select</asp:ListItem>
+                            <asp:ListItem>Active</asp:ListItem>
+                            <asp:ListItem>Inactive</asp:ListItem>
+                        </asp:DropDownList>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label>About *</label>
+                        <asp:TextBox ID="txtAbout" runat="server" TextMode="MultiLine" Rows="3" CssClass="form-control"></asp:TextBox>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <asp:Button ID="btnSaveEmployee" runat="server" Text="Save" CssClass="btn btn-warning" />
+            </div>
+
+        </div>
+    </div>
+</div>
+
 
     </form>
 </body>
