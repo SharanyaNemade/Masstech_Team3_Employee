@@ -10,48 +10,39 @@ namespace Masstech_Team3_Employee
     {
         SqlConnection conn;
 
-        string cs = ConfigurationManager.ConnectionStrings["dbconn"].ConnectionString;
-
         protected void Page_Load(object sender, EventArgs e)
         {
+
+            string cs = ConfigurationManager.ConnectionStrings["dbconn"].ConnectionString;
+            conn = new SqlConnection(cs);
+            conn.Open();
+
             if (!IsPostBack)
             {
                 FetchDepartments();
+                
             }
         }
 
         private void FetchDepartments()
         {
-            using (SqlConnection conn = new SqlConnection(cs))
-            {
-                using (SqlCommand cmd = new SqlCommand("sp_GetAllDepartment", conn))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
+            string q = $"exec sp_GetAllDepartment";
+
+
+            SqlCommand cmd = new SqlCommand(q, conn);
+                
+                    cmd.CommandType = CommandType.Text;
 
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     da.Fill(dt);
 
-                    // 🔎 FILTER BY STATUS
-                    if (!string.IsNullOrEmpty(ddlFilterStatus.SelectedValue))
-                    {
-                        dt.DefaultView.RowFilter =
-                            "Status = '" + ddlFilterStatus.SelectedValue + "'";
-                    }
-
-                    // 🔎 SEARCH
-                    if (!string.IsNullOrEmpty(txtSearch.Text))
-                    {
-                        dt.DefaultView.RowFilter =
-                            "DepartmentName LIKE '%" + txtSearch.Text + "%'";
-                    }
-
-                    // 🔎 SORT
-                    dt.DefaultView.Sort = ddlSortBy.SelectedValue + " ASC";
-
                     gvDepartment.DataSource = dt;
                     gvDepartment.DataBind();
-                }
+
+            if (gvDepartment.Rows.Count > 0)
+            {
+                gvDepartment.HeaderRow.TableSection = TableRowSection.TableHeader;
             }
         }
 
@@ -60,8 +51,7 @@ namespace Masstech_Team3_Employee
             string deptName = txtDepartmentName.Text;
             string status = ddlStatus.SelectedValue;
 
-            SqlConnection conn = new SqlConnection(cs);
-            conn.Open();
+            
 
             string q = $"exec sp_InsertDepartment '{deptName}', 0, '{status}', 'Admin'";
             SqlCommand cmd = new SqlCommand(q, conn);
@@ -98,13 +88,12 @@ namespace Masstech_Team3_Employee
             pnlModal.Visible = true;
         }
 
-        protected void gvDepartment_PageIndexChanging(object sender, GridViewPageEventArgs e)
-        {
-            gvDepartment.PageIndex = e.NewPageIndex;
+        //protected void gvDepartment_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        //{
+        //    gvDepartment.PageIndex = e.NewPageIndex;
 
-            // Rebind data again
-            FetchDepartments();   // <-- use your actual data binding method name
-        }
+        //    FetchDepartments();   
+        //}
 
         protected void btnClose_Click(object sender, EventArgs e)
         {
@@ -112,6 +101,11 @@ namespace Masstech_Team3_Employee
         }
     }
 }
+
+
+
+
+
 
 
 

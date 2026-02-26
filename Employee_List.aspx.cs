@@ -86,6 +86,53 @@ namespace Masstech_Team3_Employee
                 lblNewJoiner.Text = dr["NewJoiner"].ToString();
             }
         }
+
+        protected void btnAddEmployee_Click(object sender, EventArgs e)
+        {
+            string firstName = txtFirstName.Text;
+            string lastName = txtLastName.Text;
+            string email = txtEmail.Text;
+            string password = txtPassword.Text;
+            string joiningDate = txtJoiningDate.Text;
+            string birthDate = txtBirthDate.Text;
+            string role = ddlRole.SelectedValue;
+            string department = ddlDepartment.SelectedValue;
+            string manager = ddlManager.SelectedValue;
+            string designation = ddlNewDesignation.SelectedValue;
+            string phone = txtPhone.Text;
+            string address = txtAddress.Text;
+            string gender = ddlGender.SelectedValue;
+            string status = ddlNewStatus.SelectedValue;
+            string about = txtAbout.Text;
+
+/*            //string photoPath = "";
+
+            
+            //if (fuPhoto.HasFile)
+            //{
+            //    string fileName = Guid.NewGuid().ToString() + System.IO.Path.GetExtension(fuPhoto.FileName);
+            //    string folderPath = Server.MapPath("~/Uploads/");
+            //    fuPhoto.SaveAs(folderPath + fileName);
+            //    photoPath = "Uploads/" + fileName;
+            //}*/
+
+            string q = $"exec sp_InsertEmployee " +
+                       $"'{firstName}','{lastName}','{email}','{password}'," +
+                       $"'{joiningDate}','{birthDate}','{role}','{department}'," +
+                       $"'{manager}','{designation}','{phone}','{address}'," +
+                       $"'{gender}','{status}','{about}'";
+
+            SqlCommand cmd = new SqlCommand(q, conn);
+            cmd.ExecuteNonQuery();
+
+            Response.Write("<script>alert('Employee Saved Successfully')</script>");
+
+            FetchList();
+            LoadSummary();
+
+            ScriptManager.RegisterStartupScript(this, GetType(), "closeModal",
+            "var myModal = bootstrap.Modal.getInstance(document.getElementById('addEmployeeModal')); if(myModal){myModal.hide();}", true);
+        }
     }
 }
 

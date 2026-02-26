@@ -10,10 +10,14 @@ namespace Masstech_Team3_Employee
     {
         SqlConnection conn;
 
-        string cs = ConfigurationManager.ConnectionStrings["dbconn"].ConnectionString;
 
         protected void Page_Load(object sender, EventArgs e)
         {
+
+            string cs = ConfigurationManager.ConnectionStrings["dbconn"].ConnectionString;
+            conn = new SqlConnection(cs);
+            conn.Open();
+
             if (!IsPostBack)
             {
                 FetchRoles();
@@ -22,29 +26,29 @@ namespace Masstech_Team3_Employee
 
         private void FetchRoles()
         {
-            using (SqlConnection conn = new SqlConnection(cs))
-            {
-                // Assuming your stored procedure is named sp_GetAllRoles
-                using (SqlCommand cmd = new SqlCommand("sp_GetAllRoles", conn))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
+            string q = $"exec sp_GetAllRoles";
+
+            SqlCommand cmd = new SqlCommand(q, conn);
+
+                    
 
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     da.Fill(dt);
 
-                    // 🔎 FILTER BY STATUS
+                    // Alternate temporary Method for search, sort, filter
+
+                    // FILTER BY STATUS
                     if (!string.IsNullOrEmpty(ddlFilterStatus.SelectedValue))
                     {
                         dt.DefaultView.RowFilter =
                             "Status = '" + ddlFilterStatus.SelectedValue + "'";
                     }
 
-                    // 🔎 SEARCH
+                    // SEARCH
                     if (!string.IsNullOrEmpty(txtSearch.Text))
                     {
-                        // Note: If you already have a RowFilter from Status, 
-                        // this will overwrite it. To combine them, you would use 'AND'.
+                        
                         string filter = "RoleName LIKE '%" + txtSearch.Text + "%'";
                         if (!string.IsNullOrEmpty(dt.DefaultView.RowFilter))
                         {
@@ -53,38 +57,33 @@ namespace Masstech_Team3_Employee
                         dt.DefaultView.RowFilter = filter;
                     }
 
-                    // 🔎 SORT
+                    // SORT
                     dt.DefaultView.Sort = ddlSortBy.SelectedValue + " ASC";
 
                     gvRole.DataSource = dt;
-                    gvRole.DataBind();
-                }
-            }
+                    gvRole.DataBind();    
         }
+
+
+
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
-            using (SqlConnection conn = new SqlConnection(cs))
-            {
-                // Assuming your stored procedure is named sp_InsertRole
-                using (SqlCommand cmd = new SqlCommand("sp_InsertRole", conn))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
+            
 
-                    cmd.Parameters.AddWithValue("@RoleName", txtRoleName.Text.Trim());
-                    cmd.Parameters.AddWithValue("@Status", ddlStatus.SelectedValue);
-                    cmd.Parameters.AddWithValue("@CreatedBy", "Admin");
-                    cmd.Parameters.AddWithValue("@ModifyBy", "Admin");
+            string roleName = txtRoleName.Text.Trim();
+            string status = ddlStatus.SelectedValue;
 
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
-                }
-            }
+            string q = $"exec sp_InsertRole '{roleName}', '{status}', 'Admin', 'Admin'";
+            SqlCommand cmd = new SqlCommand(q, conn);
+            cmd.ExecuteNonQuery();
 
-            // Resetting fields
+            
+
+            Response.Write("<script>alert('Role Saved Successfully')</script>");
+
             txtRoleName.Text = "";
             ddlStatus.SelectedIndex = 0;
-
             pnlModal.Visible = false;
 
             FetchRoles();
@@ -123,27 +122,3 @@ namespace Masstech_Team3_Employee
     }
 }
 
-
-
-
-
-
-
-
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Web;
-//using System.Web.UI;
-//using System.Web.UI.WebControls;
-
-//namespace Masstech_Team3_Employee
-//{
-//    public partial class Add_Role : System.Web.UI.Page
-//    {
-//        protected void Page_Load(object sender, EventArgs e)
-//        {
-
-//        }
-//    }
-//}

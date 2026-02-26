@@ -235,12 +235,11 @@ select * from Department;
 
 
 
-INSERT INTO Department(DepartmentName,NoOfEmp,Active,CreatedBy,CreatedDate)
+INSERT INTO Department(DepartmentName,NoOfEmp,Status,CreatedBy,CreatedDate)
 VALUES
-('Human Resources', 5, 'Yes', 'Admin', GETDATE()),
-('Information Technology', 12, 'Yes', 'Admin', GETDATE()),
-('Finance', 4, 'Yes', 'Admin', GETDATE()),
-('Operations', 8, 'Yes', 'Admin', GETDATE());
+('Pharma', 12, 'Active', 'Admin', GETDATE()),
+('HR', 4, 'InActive', 'Admin', GETDATE()),
+('Management', 8, 'InActive', 'Admin', GETDATE());
 
 
 UPDATE department 

@@ -29,6 +29,8 @@ namespace Masstech_Team3_Employee
 
         private void FetchDesignations()
         {
+            // It was showing InvalidOperationException: The connection was not open.
+            conn.Open();
 
             string q = $@"exec sp_GetAllDesignations";
             SqlCommand cmd = new SqlCommand(q, conn);
@@ -36,62 +38,14 @@ namespace Masstech_Team3_Employee
             DataTable dt = new DataTable();
             da.Fill(dt);
 
-            // For Filtering by Status
-            if (!string.IsNullOrEmpty(ddlFilterStatus.SelectedValue))
-            {
-                dt.DefaultView.RowFilter = "Status = '" + ddlFilterStatus.SelectedValue + "'";
-            }
-
-            // For Searching
-            if (!string.IsNullOrEmpty(txtSearch.Text))
-            {
-                dt.DefaultView.RowFilter = "DesignationName LIKE '%" + txtSearch.Text + "%'";
-            }
-
-            // For Sorting
-            dt.DefaultView.Sort = ddlSortBy.SelectedValue + " ASC";
+            
+            conn.Close();   
 
             gvDesignation.DataSource = dt.DefaultView;
             gvDesignation.DataBind();
-
-
-
-
-
-
-            /*using (SqlCommand cmd = new SqlCommand("sp_GetAllDesignations", conn))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
-
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-
-                //  Filtering by Status
-                if (!string.IsNullOrEmpty(ddlFilterStatus.SelectedValue))
-                {
-                    dt.DefaultView.RowFilter =
-                        "Status = '" + ddlFilterStatus.SelectedValue + "'";
-                }
-
-                //  Searching
-                if (!string.IsNullOrEmpty(txtSearch.Text))
-                {
-                    dt.DefaultView.RowFilter =
-                        "DesignationName LIKE '%" + txtSearch.Text + "%'";
-                }
-
-                //  Sorting
-
-                dt.DefaultView.Sort = ddlSortBy.SelectedValue + " ASC";
-
-
-                gvDesignation.DataSource = dt.DefaultView;
-                gvDesignation.DataBind();
-
-            }*/
-
         }
+
+
 
 
 
@@ -100,102 +54,21 @@ namespace Masstech_Team3_Employee
             string desigName = txtDesignationName.Text;
             string deptName = TextBox2.Text;
             string status = ddlStatus.SelectedValue;
-            string createdBy = "Admin";
-            string ModifiedBy = "Admin";
 
-            string q = $@"exec sp_InsertDesignations '{desigName}','{deptName}', 'IT', 0, '{status}', '{createdBy}', '{ModifiedBy}'";
+            string q = $@"exec sp_InsertDesignations '{desigName}','{deptName}', 'IT', 0, '{status}', 'Admin', 'Admin'";
+            SqlCommand cmd = new SqlCommand(q, conn);
+            cmd.ExecuteNonQuery();
 
 
-            try
-            {
-                SqlCommand cmd = new SqlCommand(q, conn);
-                conn.Open();
-                cmd.ExecuteNonQuery();
+            Response.Write("<script>alert('Designation Saved Successfully')</script>");
 
-                Response.Write("<script>alert('Designation Saved Successfully');</script>");
+            pnlModal.Visible = false;
+            txtDesignationName.Text = "";
+            TextBox2.Text = "";
+            ddlStatus.SelectedIndex = 0;
 
-                // Reset UI
-                pnlModal.Visible = false;
-                txtDesignationName.Text = "";
-                TextBox2.Text = "";
-                FetchDesignations();
-            }
-            catch (Exception ex)
-            {
-                Response.Write("<script>alert('Error: " + ex.Message + "');</script>");
-            }
+            FetchDesignations();
         }
-
-        /*protected void btnSave_Click(object sender, EventArgs e)
-        {
-            string email = TextBox1.Text;
-            string username = TextBox2.Text;
-            string password = TextBox3.Text;
-            string role = DropDownList1.SelectedValue;
-
-           
-            string q = $@"exec sp_SaveUsers '{email}', '{username}', '{password}', '{role}'";
-
-            try
-            {
-               
-                if (conn.State == ConnectionState.Closed) conn.Open();
-
-                SqlCommand cmd = new SqlCommand(q, conn);
-                cmd.ExecuteNonQuery();
-
-               
-
-                Response.Write("<script>alert('User Saved Successfully');</script>");
-
-             
-                TextBox1.Text = TextBox2.Text = TextBox3.Text = "";
-                DropDownList1.SelectedIndex = 0;
-            }
-            catch (Exception ex)
-            {
-               
-                Response.Write("<script>alert('Error: " + ex.Message + "');</script>");
-            }
-        }*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        /*        protected void btnSave_Click(object sender, EventArgs e)
-                {
-
-                    using (SqlCommand cmd = new SqlCommand("sp_InsertDepartment", conn))
-                    {
-                        cmd.CommandType = CommandType.StoredProcedure;
-
-                        cmd.Parameters.AddWithValue("@DepartmentName", txtDesignationName.Text);
-                        cmd.Parameters.AddWithValue("@NoOfEmp", 0);
-                        cmd.Parameters.AddWithValue("@Status", ddlStatus.SelectedValue);
-                        cmd.Parameters.AddWithValue("@CreatedBy", "Admin");
-
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
-                    }
-
-
-                    txtDesignationName.Text = "";
-                    ddlStatus.SelectedIndex = 0;
-
-                    pnlModal.Visible = false;
-
-                    FetchDepartments();
-                }*/
 
 
         protected void ddlFilterStatus_SelectedIndexChanged(object sender, EventArgs e)
@@ -222,8 +95,7 @@ namespace Masstech_Team3_Employee
         {
             gvDesignation.PageIndex = e.NewPageIndex;
 
-            // Rebind data again
-            FetchDesignations();   //  use your actual data binding method name
+            FetchDesignations();   
         }
 
         protected void btnClose_Click(object sender, EventArgs e)

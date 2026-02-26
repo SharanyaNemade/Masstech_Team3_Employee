@@ -5,7 +5,62 @@
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
 
+    
+
 <style>
+
+    
+    .page-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .card {
+        border-radius: 10px;
+        border: none;
+    }
+
+    .card-header {
+        font-weight: 600;
+        font-size: 18px;
+        background: grey;
+        padding: 20px 24px;
+    }
+
+    table.dataTable thead th {
+        background-color: #E5E7EB;
+        color: black;
+        font-weight: 600;
+    }
+
+    table.dataTable tbody tr:hover {
+        background-color: #f3f4f6;
+    }
+
+    .dataTables_wrapper .dataTables_filter input {
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        padding: 4px 8px;
+    }
+
+    .action-icon {
+        color: black !important;
+        text-decoration: none;
+    }
+
+    .dataTables_wrapper .dt-buttons .btn {
+        background-color: whitesmoke;
+        border-radius: 8px;
+        padding: 6px 12px;
+    }
+
+
+    .dt-buttons .btn:hover {
+        color: white !important;
+        background-color: #e86425 !important;
+    }
+
 
     .status-active {
     background-color: #22c55e;
@@ -107,6 +162,64 @@
     }
 </style>
 
+    <script>
+        $(document).ready(function () {
+            $('#<%= gvDepartment.ClientID %>').DataTable({
+                pageLength: 5,
+                lengthMenu: [5,10, 25, 50, 100],
+                dom: 'Blfrtip',
+                   buttons: [
+                       {
+                           text: 'Export',
+                           className: 'btn btn-primary',
+                           extend: 'collection',
+                           buttons: [
+                               { extend: 'excel', text: 'Export to Excel' },
+                               { extend: 'pdf', text: 'Export to PDF' },
+                           ]
+                       }
+                   ],
+                   language: {
+                       search: "Search:",
+                       lengthMenu: "Show _MENU_ entries",
+                       info: "Showing _START_ to _END_ of _TOTAL_ entries"
+                   }
+               });
+           });
+    </script>
+
+
+
+    <%--<script>
+        $(document).ready(function () {
+            $('#<%= gvDepartment.ClientID %>').DataTable({
+             pageLength: 10,
+             lengthMenu: [10, 25, 50, 100],
+             ordering: true,
+             searching: true,
+             paging: true,
+             info: true,
+             dom: 'Bfrtip',
+             buttons: [
+                 {
+                     text: 'Export',
+                     className: 'btn btn-primary',
+                     extend: 'collection',
+                     buttons: [
+                         { extend: 'excel', text: 'Export to Excel' },
+                         { extend: 'pdf', text: 'Export to PDF' },
+                     ]
+                 }
+             ],
+             language: {
+                 search: "Search:",
+                 lengthMenu: "Show _MENU_ entries",
+                 info: "Showing _START_ to _END_ of _TOTAL_ entries"
+             }
+         });
+     });
+    </script>--%>
+
 <div class="department-container">
 
     <div class="page-title">Departments</div>
@@ -147,14 +260,15 @@
         </asp:DropDownList>
     </div>
 
-    <div>
+<!--    <div>
         <asp:TextBox ID="txtSearch" runat="server" placeholder="Search..." />
+
         <asp:Button ID="btnSearch"
             runat="server"
             Text="Search"
             CssClass="btn-orange"
             OnClick="btnSearch_Click" />
-    </div>
+    </div>      -->
 
 </div>
 
@@ -163,11 +277,7 @@
 
 <asp:GridView ID="gvDepartment"
     runat="server"
-    AutoGenerateColumns="False"
-    CssClass="dept-grid table table-bordered"
-    AllowPaging="true"
-    PageSize="4"
-    OnPageIndexChanging="gvDepartment_PageIndexChanging">
+    AutoGenerateColumns="False">
 
     <Columns>
 
@@ -188,6 +298,8 @@
         </asp:TemplateField>
 
     </Columns>
+
+    
 
 </asp:GridView>
 
@@ -227,6 +339,7 @@
     </asp:Panel>
 
 </div>
+
 
 </asp:Content>
 
